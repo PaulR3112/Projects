@@ -6,6 +6,7 @@ email: pavel.ryzner@gmail.com
 discord: Pavel.R
 
 """
+import string
 
 TEXTS = [
 
@@ -65,7 +66,7 @@ else:
 # definovanie možnosti pre výber z listu "TEXTS" iba digit.
 while True:
     options = input("Enter a number btw. 1 and 3 to select: ")
-    if options.isdigit() and int(options) in range(1,200):
+    if options.isdigit() and int(options) in [1,2,3]:
         options = int(options)
         break
     else:
@@ -74,11 +75,17 @@ while True:
         
 # kompletný výpis
 selected_text = TEXTS[options - 1]
-words = selected_text.split()
+
+# odstránenie interpunkcie
+interpunct = str.maketrans('', '', string.punctuation)
+clean_text = selected_text.translate(interpunct)
+
+# čistý text
+words = clean_text.split()
 word_count = len(words)
 
 titlecase = sum(1 for word in words if word.istitle())
-uppercase = sum(1 for word in words if word.isupper())
+uppercase = sum(1 for word in words if word.isupper() and word.isalpha())
 lowercase = sum(1 for word in words if word.islower())
 numeric =  [word for word in words if word.isdigit()]
 numeric_count = len(numeric)
@@ -110,8 +117,7 @@ for length in word_lenghts:
 
 for length in sorted(length_count):
     count = length_count[length]
-    print(f"{length :>3}|{"*" * count:<15}|{count}")
-
+    print(f"{length :>3}|{'*' * count:<15}|{count}")
 
 
 
