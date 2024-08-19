@@ -65,7 +65,7 @@ else:
 # definovanie možnosti pre výber z listu "TEXTS" iba digit.
 while True:
     options = input("Enter a number btw. 1 and 3 to select: ")
-    if options.isdigit() and int(options) in [1,2,3]:
+    if options.isdigit() and int(options) in range(1,200):
         options = int(options)
         break
     else:
