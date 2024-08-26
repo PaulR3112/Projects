@@ -84,7 +84,7 @@ clean_text = selected_text.translate(interpunct)
 words = clean_text.split()
 word_count = len(words)
 
-titlecase = sum(1 for word in words if word[0].isupper() and word[1:].islower()) # poznamka od lektora. Použité indexovanie
+titlecase = sum(1 for word in words if word[0].isupper() and word[1:].islower()) # poznamka od lektora. Použité indexovanie namiesto "istitle"
 uppercase = sum(1 for word in words if word.isupper() and word.isalpha())
 lowercase = sum(1 for word in words if word.islower())
 numeric =  [word for word in words if word.isdigit()]
