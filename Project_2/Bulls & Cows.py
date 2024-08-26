@@ -29,16 +29,16 @@ def vytvor_tajne_cislo():
 # Kontrola spravnosti vstupu 
 def skontroluj_vstup(vstup):
     if len(vstup) != 4:
-        print("Vstup musí mať presne 4 číslice.")
+        print("The input must have exactly 4 digits.")
         return False
     if not vstup.isdigit():
-        print("Vstup musí obsahovať iba číslice.")
+        print("Input must contain digits only.")
         return False
     if vstup[0] == '0':
-        print("Číslo nesmie začínať nulou.")
+        print("The number must not start with zero.")
         return False
     if len(set(vstup)) != 4:
-        print("Číslice musia byť unikátne.")
+        print("Digits must be unique.")
         return False
     return True
 
