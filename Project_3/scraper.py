@@ -6,18 +6,15 @@ discord: Paul33 paul335110
 
 """
 
-
-python scraper.py "https://www.volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=3&xnumnuts=3101" vysledky_budejovice.csv
-
-
 import sys
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import html
+import os
 
 def validate_arguments():
-    """Overenie, či boli zadané správne argumenty."""
+    """Overenie správnosti argumentov."""
     if len(sys.argv) != 3:
         print("Použitie: python scraper.py <URL> <output_file.csv>")
         sys.exit(1)
@@ -33,20 +30,22 @@ def validate_arguments():
         print("Chyba: Výstupný súbor musí mať príponu .csv.")
         sys.exit(1)
 
-    return url, output_file
+    # Nastavenie uložiska
+    output_path = os.path.join("C:\\Users\\Home\\Downloads", output_file)
+    return url, output_path
 
 def download_data(url):
-    """Stiahne HTML obsah stránky."""
+    """Stiahnutie HTML obsahu zo stránky."""
     response = requests.get(url)
     if response.status_code != 200:
-        print(f"Chyba: stránka sa nepodarilo načítať (status {response.status_code}).")
+        print(f"Chyba: stránku sa nepodarilo načítať (status {response.status_code}).")
         sys.exit(1)
 
     response.encoding = response.apparent_encoding
     return response.text
 
 def parse_main_page(html):
-    """Extrahuje odkazy na detailné stránky obcí."""
+    """Extrahuje odkazy stránky obcí v detaile."""
     soup = BeautifulSoup(html, 'html.parser')
     rows = soup.find_all('tr')
     links = []
@@ -64,12 +63,12 @@ def parse_main_page(html):
                 full_link = base_url + relative_link
                 links.append((code, name, full_link))
             else:
-                print(f"Varovanie: Obec {name} (kód: {code}) nemá odkaz na detailnú stránku.")
+                print(f"Upozornenie: Obec {name} (kód: {code}) nemá odkaz na detail stránky.")
 
     return links
 
 def safe_extract(soup, headers):
-    """Bezpečne extrahuje text na základe atribútu headers."""
+    """Extrahuje text na základe atribútu "headers"."""
     element = soup.find('td', headers=headers)
     return element.text.strip() if element else "N/A"
 
@@ -77,19 +76,19 @@ def parse_obec_page(html_content):
     """Extrahuje údaje o konkrétnej obci."""
     soup = BeautifulSoup(html_content, 'html.parser')
 
-    # Získanie údajov o voličoch a hlasech
+    # Získanie údajov o voličoch a jeho hlasoch
     registered = safe_extract(soup, "sa2")
     envelopes = safe_extract(soup, "sa3")
     valid = safe_extract(soup, "sa6")
 
-    # Hlasy pre jednotlivé strany
+    # Hlasy - jednotlivé strany
     parties = [html.unescape(header.text.strip()) for header in soup.find_all('td', headers="t1sa1 t1sb2")]
     votes = [cell.text.strip() for cell in soup.find_all('td', headers="t1sa2 t1sb3")]
 
     return registered, envelopes, valid, parties, votes
 
 def save_to_csv(data, output_file, parties):
-    """Uloží extrahované údaje do CSV."""
+    """Uloží extrahovaný súbor do .csv."""
     if not data:
         print("Chyba: Žiadne údaje neboli extrahované.")
         sys.exit(1)
@@ -97,10 +96,9 @@ def save_to_csv(data, output_file, parties):
     # Hlavička CSV súboru
     header = ['code', 'location', 'registered', 'envelopes', 'valid'] + parties
 
-    # Uloženie s podporou UTF-8 a bodkočiarkovým oddelovačom
     df = pd.DataFrame(data, columns=header)
     df.to_csv(output_file, index=False, encoding='utf-8-sig', sep=';')
-    print(f"Výsledky boli uložené do súboru {output_file}")
+    print(f"Výsledky boli uložené do súboru: {output_file}")
 
 if __name__ == "__main__":
     url, output_file = validate_arguments()
